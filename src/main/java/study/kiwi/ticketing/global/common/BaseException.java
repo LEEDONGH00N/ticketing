@@ -2,8 +2,8 @@ package study.kiwi.ticketing.global.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import study.kiwi.ticketing.global.common.codes.BaseCode;
-import study.kiwi.ticketing.global.common.reason.Reason;
+import study.kiwi.ticketing.global.codes.BaseCode;
+import study.kiwi.ticketing.global.codes.reason.Reason;
 
 @Getter
 @AllArgsConstructor

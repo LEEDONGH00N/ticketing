@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import study.kiwi.ticketing.global.common.codes.SuccessCode;
+import study.kiwi.ticketing.global.codes.SuccessCode;
 
 @Getter
 @AllArgsConstructor

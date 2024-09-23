@@ -1,9 +1,9 @@
-package study.kiwi.ticketing.global.common.codes;
+package study.kiwi.ticketing.global.codes;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import study.kiwi.ticketing.global.common.reason.Reason;
+import study.kiwi.ticketing.global.codes.reason.Reason;
 
 @Getter
 @AllArgsConstructor
@@ -17,6 +17,11 @@ public enum SuccessCode implements BaseCode{
 
     @Override
     public Reason.ReasonDto getReasonHttpStatus() {
-        return null;
+        return Reason.ReasonDto.builder()
+                .message(message)
+                .code(code)
+                .isSuccess(true)
+                .httpStatus(httpStatus)
+                .build();
     }
 }
