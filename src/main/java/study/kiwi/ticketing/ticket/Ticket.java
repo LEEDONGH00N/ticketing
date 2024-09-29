@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import study.kiwi.ticketing.event.EventSchedule;
 import study.kiwi.ticketing.member.Member;
+import study.kiwi.ticketing.payment.Payment;
 
 import java.time.LocalDate;
 
@@ -36,5 +37,9 @@ public class Ticket {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_schedule_id")
     private EventSchedule eventSchedule;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "patment_id")
+    private Payment payment;
 
 }

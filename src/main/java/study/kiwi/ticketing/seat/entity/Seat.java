@@ -11,9 +11,13 @@ import study.kiwi.ticketing.event.EventSchedule;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//@Table(indexes = {
-//        @Index(name = "seat_key_id", columnList = "")
-//})
+@Table(name = "seat", indexes = {
+        @Index(name = "idx_seat_location", columnList = "seatLocation"),
+        @Index(name = "idx_seat_rank", columnList = "seatRank"),
+        @Index(name = "idx_is_selected", columnList = "isSelected"),
+        @Index(name = "idx_is_payed", columnList = "isPayed"),
+        @Index(name = "idx_event_schedule", columnList = "event_schedule_id")
+})
 public class Seat {
 
     @EmbeddedId
@@ -31,7 +35,7 @@ public class Seat {
 
     @MapsId("eventScheduleId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_event_schedule_id")
+    @JoinColumn(name = "event_schedule_id")
     private EventSchedule eventSchedule;
 
 

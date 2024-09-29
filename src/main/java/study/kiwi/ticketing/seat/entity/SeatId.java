@@ -14,5 +14,4 @@ import java.time.LocalDate;
 public class SeatId implements Serializable {
 
     private Long eventScheduleId;
-
 }

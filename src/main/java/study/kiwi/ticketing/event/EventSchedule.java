@@ -1,7 +1,9 @@
 package study.kiwi.ticketing.event;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import study.kiwi.ticketing.eventPlace.EventPlace;
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static study.kiwi.ticketing.event.dto.EventScheduleRequestDto.*;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -22,10 +26,13 @@ public class EventSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private LocalDate eventStartTime;
 
+    @NotNull
     private LocalDate eventStartDate;
 
+    @NotNull
     private LocalDateTime eventTicketingLinkOpenTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,5 +49,20 @@ public class EventSchedule {
 
     @OneToOne(mappedBy = "eventSchedule")
     private Ticket ticket;
+
+    @Builder
+    private EventSchedule(LocalDate eventStartTime, LocalDate eventStartDate, LocalDateTime eventTicketingLinkOpenTime){
+        this.eventStartTime = eventStartTime;
+        this.eventStartDate = eventStartDate;
+        this.eventTicketingLinkOpenTime = eventTicketingLinkOpenTime;
+    }
+
+    public static EventSchedule from(EventScheduleCreateRequestDto request){
+        return EventSchedule.builder()
+                .eventTicketingLinkOpenTime(request.eventTicketingLinkOpenTime())
+                .eventStartDate(request.eventStartDate())
+                .eventStartTime(request.eventStartTime())
+                .build();
+    }
 
 }

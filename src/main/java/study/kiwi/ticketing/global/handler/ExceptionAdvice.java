@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import study.kiwi.ticketing.global.codes.ErrorCode;
 import study.kiwi.ticketing.global.common.ApiResponse;
 import study.kiwi.ticketing.global.common.BaseException;
 import study.kiwi.ticketing.global.codes.reason.Reason.ReasonDto;
@@ -35,8 +36,9 @@ public class ExceptionAdvice {
 
     @ExceptionHandler
     public ResponseEntity<Object> exception(Exception e) {
-        ApiResponse<?> apiResponse = ApiResponse.onFailure(BAD_REQUEST.getCode(), e.getMessage(), null);
-        return handleExceptionInternalFalse(apiResponse);
+        log.error(e.getMessage());
+        ApiResponse<?> baseResponse = ApiResponse.onFailure(ErrorCode.INTERNAL_SERVER_ERROR.getCode(), e.getMessage(), null);
+        return handleExceptionInternalFalse(baseResponse);
     }
 
     private ResponseEntity<Object> handleExceptionInternalFalse(ApiResponse<?> response) {
