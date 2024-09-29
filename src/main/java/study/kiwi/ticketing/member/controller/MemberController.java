@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import study.kiwi.ticketing.global.common.ApiResponse;
 import study.kiwi.ticketing.member.service.MemberService;
-import study.kiwi.ticketing.member.validator.SignUpFormValidator;
 
 import static study.kiwi.ticketing.member.dto.MemberRequest.*;
 
@@ -20,11 +19,9 @@ import static study.kiwi.ticketing.member.dto.MemberRequest.*;
 public class MemberController {
 
     private final MemberService memberService;
-    private final SignUpFormValidator signUpFormValidator;
 
     @PostMapping("/signup")
-    public ApiResponse<?> signup(@Valid @RequestBody MemberSignupReqDto request, BindingResult bindingResult) {
-        signUpFormValidator.validate(request, bindingResult);
+    public ApiResponse<?> signup(@Valid @RequestBody MemberSignupReqDto request) {
         return ApiResponse.onSuccess(memberService.memberSignup(request));
     }
 
