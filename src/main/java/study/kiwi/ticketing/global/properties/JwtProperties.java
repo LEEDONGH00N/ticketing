@@ -6,4 +6,6 @@ public class JwtProperties {
     public static final String JWT_ACCESS_TOKEN_HEADER_NAME = "Authorization";
     public static final String JWT_ACCESS_TOKEN_TYPE = "Bearer ";
     public static final String JWT_REFRESH_TOKEN_COOKIE_NAME = "X-REFRESH-TOKEN";
+    public static final String JWT_ACCESS = "Access";
+    public static final String JWT_REFRESH = "Refresh";
 }
