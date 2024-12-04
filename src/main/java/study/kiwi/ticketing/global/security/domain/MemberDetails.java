@@ -1,49 +1,23 @@
-package study.kiwi.ticketing.oauth2.domain;
+package study.kiwi.ticketing.global.security.domain;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import study.kiwi.ticketing.member.dto.MemberAuthContext;
+import study.kiwi.ticketing.member.Member;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Getter
-public class MemberDetails implements UserDetails, OAuth2User {
+@RequiredArgsConstructor
+public class MemberDetails implements UserDetails{
 
-    private final MemberAuthContext context;
-
-    private Map<String, Object> attributes;
-
-    // 일반 로그인
-    public MemberDetails(MemberAuthContext context) {
-        this.context = context;
-    }
-
-    // OAuth 로그인
-    public MemberDetails(MemberAuthContext context, Map<String, Object> attributes) {
-        this.context = context;
-        this.attributes = attributes;
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return this.attributes;
-    }
-
+    private final Member member;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<String> roles = new ArrayList<>();
-        roles.add("ROLE_" + context.role());
-        return roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        return authorities;
     }
 
     @Override
@@ -53,7 +27,7 @@ public class MemberDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getUsername() {
-        return context.email();
+        return "";
     }
 
     @Override
@@ -74,10 +48,5 @@ public class MemberDetails implements UserDetails, OAuth2User {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    @Override
-    public String getName() {
-        return context.name();
     }
 }

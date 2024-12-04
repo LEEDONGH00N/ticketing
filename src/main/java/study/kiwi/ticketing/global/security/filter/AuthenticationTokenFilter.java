@@ -1,4 +1,4 @@
-package study.kiwi.ticketing.global.filter;
+package study.kiwi.ticketing.global.security.filter;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
@@ -15,9 +15,9 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import study.kiwi.ticketing.global.common.BaseException;
-import study.kiwi.ticketing.global.token.JwtProvider;
-import study.kiwi.ticketing.oauth2.domain.MemberDetails;
-import study.kiwi.ticketing.member.service.MemberDetailsService;
+import study.kiwi.ticketing.global.token.provider.JwtProvider;
+import study.kiwi.ticketing.global.security.domain.MemberDetails;
+import study.kiwi.ticketing.global.security.service.MemberDetailsService;
 
 import java.io.IOException;
 
