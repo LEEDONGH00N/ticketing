@@ -1,4 +1,4 @@
-package study.kiwi.ticketing.global.security.handler;
+package study.kiwi.ticketing.oauth2.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

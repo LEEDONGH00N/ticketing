@@ -1,12 +1,9 @@
-package study.kiwi.ticketing.global.security.handler;
+package study.kiwi.ticketing.oauth2.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.server.Session;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -16,12 +13,8 @@ import study.kiwi.ticketing.global.token.provider.JwtProvider;
 import study.kiwi.ticketing.global.token.repository.RefreshTokenRepository;
 import study.kiwi.ticketing.global.token.vo.AccessTokenVO;
 import study.kiwi.ticketing.global.token.vo.TokenResponse;
-import study.kiwi.ticketing.global.codes.ErrorCode;
-import study.kiwi.ticketing.global.common.BaseException;
 import study.kiwi.ticketing.member.Member;
 import study.kiwi.ticketing.oauth2.domain.OAuth2UserImpl;
-import study.kiwi.ticketing.oauth2.domain.OAuthProviderType;
-import study.kiwi.ticketing.member.repository.MemberRepository;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -40,13 +33,8 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
-
         Member member = ((OAuth2UserImpl) authentication.getPrincipal()).getMember();
         TokenResponse tokenResponse = jwtProvider.generateToken(member);
-
-        log.info("oAuthUser Role : {}", member.getRole());
-        log.info("oAuthUser Name : {}", member.getName());
-
         if(member.getRole().equals(Member.Role.GUEST)){
             redirectToSignupWithUserInfo(request, response, member, tokenResponse.accessToken());
             return;
@@ -70,16 +58,19 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
                                               HttpServletResponse response,
                                               Member member,
                                               AccessTokenVO accessToken) throws IOException {
+        log.info("최초 로그인인 경우 추가 정보 입력을 위한 회원가입 페이지로 리다이렉트 ");
         response.addHeader(JWT_REFRESH_TOKEN_COOKIE_NAME, JWT_ACCESS_TOKEN_TYPE + accessToken);
-        String redirectURL = createUri(member);
+        String redirectURL = createRedirectUri(member);
         getRedirectStrategy().sendRedirect(request, response, redirectURL);
     }
 
-    private String createUri(Member member) {
+    private String createRedirectUri(Member member) {
         return UriComponentsBuilder.fromUriString("http://localhost:8080/oauth2/signup")
                 .queryParam("email", member.getEmail())
                 .queryParam("providerType", member.getProviderType())
                 .queryParam("oauthId", member.getOauthId())
+                .queryParam("name", member.getName())
+                .queryParam("phoneNum", member.getPhoneNum())
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUriString();
