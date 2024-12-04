@@ -1,4 +1,4 @@
-package study.kiwi.ticketing.global.security.auth.handler;
+package study.kiwi.ticketing.global.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +15,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Component
 public class OAuthFailureHandler implements AuthenticationFailureHandler {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,

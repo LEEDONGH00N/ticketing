@@ -1,10 +1,11 @@
-package study.kiwi.ticketing.member.dto;
+package study.kiwi.ticketing.oauth2.domain;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import study.kiwi.ticketing.member.dto.MemberAuthContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,10 +20,12 @@ public class MemberDetails implements UserDetails, OAuth2User {
 
     private Map<String, Object> attributes;
 
+    // 일반 로그인
     public MemberDetails(MemberAuthContext context) {
         this.context = context;
     }
 
+    // OAuth 로그인
     public MemberDetails(MemberAuthContext context, Map<String, Object> attributes) {
         this.context = context;
         this.attributes = attributes;
@@ -45,7 +48,7 @@ public class MemberDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getPassword() {
-        return context.password();
+        return "";
     }
 
     @Override
@@ -75,6 +78,6 @@ public class MemberDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return "";
+        return context.name();
     }
 }

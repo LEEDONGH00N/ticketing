@@ -9,8 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
@@ -18,8 +18,11 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import study.kiwi.ticketing.oauth2.service.CustomOAuth2Service;
 import study.kiwi.ticketing.global.filter.AuthenticationTokenFilter;
-import study.kiwi.ticketing.global.security.auth.token.JwtProvider;
+import study.kiwi.ticketing.global.handler.OAuthFailureHandler;
+import study.kiwi.ticketing.global.handler.OAuthSuccessHandler;
+import study.kiwi.ticketing.global.token.JwtProvider;
 import study.kiwi.ticketing.member.service.MemberDetailsService;
 
 @Configuration
@@ -29,17 +32,20 @@ public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final MemberDetailsService memberDetailsService;
+    private final OAuthSuccessHandler oAuthSuccessHandler;
+    private final OAuthFailureHandler oAuthFailureHandler;
+    private final CustomOAuth2Service customOAuth2Service;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/", "/home/**", "/signup", "/index/**", "/index.js", "/favicon.ico", "/login/**", "/kakao-login", "/templates").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/", "/naver-login" ,"/oauth2/**", "/home", "/signup", "/index/**", "/index.js", "/favicon.ico", "/login", "/templates").permitAll()
+                        .anyRequest()
+                        .authenticated())
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(LogoutConfigurer::permitAll)
@@ -48,13 +54,12 @@ public class SecurityConfig {
                             .securityContextRepository(securityContextRepository())
                             .requireExplicitSave(true);
                 })
-                // OAuth2
-//                .oauth2Login(oauth2Login -> oauth2Login
-//                        .defaultSuccessUrl("/home")
-//                        .successHandler(oAuthSuccessHandler)
-//                        .failureHandler(oAuthFailureHandler))
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
-
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .userInfoEndpoint(c -> c
+                                .userService(customOAuth2Service))
+                        .successHandler(oAuthSuccessHandler)
+                        .failureHandler(oAuthFailureHandler))
+                .addFilterBefore(jwtAuthFilter(), OAuth2LoginAuthenticationFilter.class);
 
         return http.build();
     }
@@ -84,5 +89,4 @@ public class SecurityConfig {
                 new HttpSessionSecurityContextRepository()
         );
     }
-
 }

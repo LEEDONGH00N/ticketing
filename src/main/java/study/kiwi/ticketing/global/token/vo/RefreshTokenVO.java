@@ -1,4 +1,4 @@
-package study.kiwi.ticketing.global.security.auth.token.vo;
+package study.kiwi.ticketing.global.token.vo;
 
 public record RefreshTokenVO(
         String token

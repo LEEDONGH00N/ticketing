@@ -9,7 +9,7 @@ import study.kiwi.ticketing.global.codes.ErrorCode;
 import study.kiwi.ticketing.global.common.BaseException;
 import study.kiwi.ticketing.member.Member;
 import study.kiwi.ticketing.member.dto.MemberAuthContext;
-import study.kiwi.ticketing.member.dto.MemberDetails;
+import study.kiwi.ticketing.oauth2.domain.MemberDetails;
 import study.kiwi.ticketing.member.repository.MemberRepository;
 
 @RequiredArgsConstructor
@@ -20,6 +20,7 @@ public class MemberDetailsService implements UserDetailsService {
 
     @Override
     public MemberDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
+        log.info("loadUserByUsername 진입");
         Member member = memberRepository.findMemberByEmail(userEmail)
                 .orElseThrow(() -> {
                     log.info("[loadUserByUsername] username:{}, {}", userEmail, ErrorCode.MEMBER_NOT_FOUND);
