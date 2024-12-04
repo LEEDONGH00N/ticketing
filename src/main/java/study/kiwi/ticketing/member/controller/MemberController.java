@@ -1,15 +1,16 @@
 package study.kiwi.ticketing.member.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import study.kiwi.ticketing.global.common.ApiResponse;
+import study.kiwi.ticketing.global.security.domain.MemberDetails;
 import study.kiwi.ticketing.member.service.MemberService;
+
+import java.util.Arrays;
 
 import static study.kiwi.ticketing.member.dto.MemberRequest.*;
 
@@ -20,14 +21,13 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping("/signup")
-    public ApiResponse<?> signup(@Valid @RequestBody MemberSignupReqDto request) {
-        return ApiResponse.onSuccess(memberService.memberSignup(request));
+    @GetMapping("/home")
+    public String home(@AuthenticationPrincipal MemberDetails principal) {
+        return principal.getMember().toString();
     }
 
-    @PostMapping("/login")
-    public ApiResponse<?> login(@Valid @RequestBody MemberLoginReqDto request, HttpServletResponse response) {
-        return ApiResponse.onSuccess(memberService.memberLogin(request, response));
+    @PostMapping("/api/signup")
+    public ApiResponse<?> signup(@Valid @RequestBody MemberNaverSignupReqDto request) {
+        return ApiResponse.onSuccess(memberService.signupAfterNaverLogin(request));
     }
-
 }

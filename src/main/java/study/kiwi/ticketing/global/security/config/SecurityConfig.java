@@ -1,4 +1,4 @@
-package study.kiwi.ticketing.global.config;
+package study.kiwi.ticketing.global.security.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,12 +18,13 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import study.kiwi.ticketing.global.security.handler.LoginSuccessHandler;
 import study.kiwi.ticketing.oauth2.service.CustomOAuth2Service;
-import study.kiwi.ticketing.global.filter.AuthenticationTokenFilter;
-import study.kiwi.ticketing.global.handler.OAuthFailureHandler;
-import study.kiwi.ticketing.global.handler.OAuthSuccessHandler;
-import study.kiwi.ticketing.global.token.JwtProvider;
-import study.kiwi.ticketing.member.service.MemberDetailsService;
+import study.kiwi.ticketing.global.security.filter.AuthenticationTokenFilter;
+import study.kiwi.ticketing.oauth2.handler.OAuthFailureHandler;
+import study.kiwi.ticketing.oauth2.handler.OAuthLoginSuccessHandler;
+import study.kiwi.ticketing.global.token.provider.JwtProvider;
+import study.kiwi.ticketing.global.security.service.MemberDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -32,16 +33,17 @@ public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final MemberDetailsService memberDetailsService;
-    private final OAuthSuccessHandler oAuthSuccessHandler;
+    private final OAuthLoginSuccessHandler oAuthSuccessHandler;
     private final OAuthFailureHandler oAuthFailureHandler;
     private final CustomOAuth2Service customOAuth2Service;
+    private final LoginSuccessHandler loginSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/", "/naver-login" ,"/oauth2/**", "/home", "/signup", "/index/**", "/index.js", "/favicon.ico", "/login", "/templates").permitAll()
+                        .requestMatchers("/" ,"/oauth2/**", "/api/**", "/home", "/signup", "/index/**", "/index.js", "/favicon.ico", "/login", "/templates").permitAll()
                         .anyRequest()
                         .authenticated())
                 .cors(Customizer.withDefaults())

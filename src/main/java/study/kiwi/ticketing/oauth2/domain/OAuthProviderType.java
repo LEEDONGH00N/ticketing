@@ -1,4 +1,4 @@
-package study.kiwi.ticketing.member;
+package study.kiwi.ticketing.oauth2.domain;
 
 import lombok.Getter;
 

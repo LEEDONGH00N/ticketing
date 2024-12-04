@@ -1,16 +1,17 @@
-package study.kiwi.ticketing.member.service;
+package study.kiwi.ticketing.global.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import study.kiwi.ticketing.global.codes.ErrorCode;
 import study.kiwi.ticketing.global.common.BaseException;
-import study.kiwi.ticketing.member.Member;
-import study.kiwi.ticketing.member.dto.MemberAuthContext;
-import study.kiwi.ticketing.oauth2.domain.MemberDetails;
+import study.kiwi.ticketing.global.security.domain.MemberDetails;
 import study.kiwi.ticketing.member.repository.MemberRepository;
+
+import java.util.Collections;
 
 @RequiredArgsConstructor
 @Service
@@ -21,12 +22,8 @@ public class MemberDetailsService implements UserDetailsService {
     @Override
     public MemberDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
         log.info("loadUserByUsername 진입");
-        Member member = memberRepository.findMemberByEmail(userEmail)
-                .orElseThrow(() -> {
-                    log.info("[loadUserByUsername] username:{}, {}", userEmail, ErrorCode.MEMBER_NOT_FOUND);
-                    return new BaseException(ErrorCode.MEMBER_NOT_FOUND);
-                });
-        MemberAuthContext ctx = MemberAuthContext.of(member);
-        return new MemberDetails(ctx);
+        return memberRepository.findMemberByEmail(userEmail)
+                .map(member -> new MemberDetails(member, Collections.singleton(new SimpleGrantedAuthority(member.getRole().name()))))
+                .orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

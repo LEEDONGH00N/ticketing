@@ -1,12 +1,13 @@
 package study.kiwi.ticketing.member;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import study.kiwi.ticketing.member.dto.MemberRequest;
+import study.kiwi.ticketing.oauth2.userInfo.OAuth2UserInfo;
+import study.kiwi.ticketing.oauth2.domain.OAuthProviderType;
 import study.kiwi.ticketing.payment.Payment;
 
 import java.util.ArrayList;
@@ -16,49 +17,59 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NotNull
     private String name;
-
-    @NotNull
     private String email;
+    private String oauthId;
+    private String phoneNum;
 
-    @NotNull
-    private String encodedPassword;
+    @Enumerated(value = EnumType.STRING)
+    private OAuthProviderType providerType;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
     private List<Payment> payments = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    private Role role;
 
-    @Getter
     public enum Role {
         USER("USER"),
-        ADMIN("ADMIN");
+        GUEST("GUEST");
 
-        Role(String name) {}
+        Role(String type) {}
 
-        private String name;
+        private String type;
     }
-
 
     @Builder
-    private Member(String name, String email, String password) {
+    private Member(String name, String email, String oauthId, OAuthProviderType oAuthProviderType, Role role, String phoneNum) {
         this.name = name;
         this.email = email;
-        this.encodedPassword = password;
+        this.oauthId = oauthId;
+        this.providerType = oAuthProviderType;
+        this.role = role;
+        this.phoneNum = phoneNum;
     }
 
-    public static Member from(MemberRequest.MemberSignupReqDto request, String encodedPassword) {
+    public static Member createMemberGuest(OAuth2UserInfo userInfo, OAuthProviderType type){
         return Member.builder()
-                .email(request.email())
-                .name(request.name())
-                .password(encodedPassword)
+                .name(userInfo.getName())
+                .email(userInfo.getEmail())
+                .oAuthProviderType(type)
+                .oauthId(userInfo.getSocialId())
+                .phoneNum(userInfo.getPhoneNum())
+                .role(Role.GUEST)
                 .build();
     }
 
+    public static Member createMember(MemberRequest.MemberNaverSignupReqDto request){
+        return Member.builder()
+                .name(request.name())
+                .phoneNum(request.phoneNum())
+                .email(request.email())
+                .oauthId(request.oauthId())
+                .role(Role.USER)
+                .build();
+    }
 }
