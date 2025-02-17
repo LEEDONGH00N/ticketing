@@ -1,13 +1,16 @@
 package study.kiwi.ticketing.global.security.domain;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import study.kiwi.ticketing.member.dto.AuthenticatedMember;
-import study.kiwi.ticketing.member.dto.MemberRequest;
+import org.springframework.security.core.GrantedAuthority;
+import study.kiwi.ticketing.domain.member.dto.AuthenticatedMember;
+import study.kiwi.ticketing.domain.member.dto.MemberRequest;
+
+import java.util.Collection;
 
 public class MemberAuthenticationToken extends AbstractAuthenticationToken {
 
-    private Object principal;
-    private String credentials;
+    private final Object principal;
+    private final Object credentials;
 
     private MemberAuthenticationToken(String email, String password) {
         super(null);
@@ -16,10 +19,12 @@ public class MemberAuthenticationToken extends AbstractAuthenticationToken {
         this.setAuthenticated(false);
     }
 
-    private MemberAuthenticationToken(Object principal, String credentials) {
-        super(null);
+    private MemberAuthenticationToken(Object principal,
+                                      Object credentials,
+                                      Collection<? extends GrantedAuthority> authorities) {
+        super(authorities);
         this.principal = principal;
-        this.credentials = null;
+        this.credentials = credentials;
         this.setAuthenticated(true);
     }
 
@@ -29,17 +34,19 @@ public class MemberAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     // 인증 처리 후 객체
-    public static MemberAuthenticationToken authenticated(AuthenticatedMember principal){
-        return new MemberAuthenticationToken(principal, null);
+    public static MemberAuthenticationToken authenticated(AuthenticatedMember authentication){
+        return new MemberAuthenticationToken(authentication,
+                authentication.getEncodedPassword(),
+                authentication.getAuthorities());
     }
 
     @Override
     public Object getCredentials() {
-        return null;
+        return credentials;
     }
 
     @Override
     public Object getPrincipal() {
-        return null;
+        return principal;
     }
 }

@@ -12,7 +12,7 @@ import study.kiwi.ticketing.global.token.vo.AccessTokenVO;
 import study.kiwi.ticketing.global.token.vo.RefreshTokenVO;
 import study.kiwi.ticketing.global.token.vo.TokenResponse;
 import study.kiwi.ticketing.global.common.BaseException;
-import study.kiwi.ticketing.member.Member;
+import study.kiwi.ticketing.domain.member.dto.AuthenticatedMember;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -41,19 +41,18 @@ public class JwtProvider implements TokenProvider {
         this.SECRET_KEY = new SecretKeySpec(keyBytes, "HmacSHA256");
     }
 
-
-    public TokenResponse generateToken(Member member){
-        AccessTokenVO accessToken = generateAccessToken(member);
-        RefreshTokenVO refreshToken = generateRefreshToken(member);
-
-       return new TokenResponse(accessToken, refreshToken);
+    public TokenResponse generateToken(AuthenticatedMember authenticatedMember){
+        AccessTokenVO accessToken = generateAccessToken(authenticatedMember);
+        RefreshTokenVO refreshToken = generateRefreshToken(authenticatedMember);
+        return new TokenResponse(accessToken, refreshToken);
     }
 
-    public AccessTokenVO generateAccessToken(Member member) {
-        if (member.getEmail() == null || member.getEmail().isBlank()) {
+    public AccessTokenVO generateAccessToken(AuthenticatedMember authenticatedMember) {
+        if (authenticatedMember.getEmail() == null ||
+                authenticatedMember.getEmail().isBlank()) {
             return AccessTokenVO.of("");
         }
-        return this.generateAccessToken(member.getEmail());
+        return this.generateAccessToken(authenticatedMember.getEmail());
     }
 
     private AccessTokenVO generateAccessToken(String email) {
@@ -65,16 +64,15 @@ public class JwtProvider implements TokenProvider {
                 .expiration(new Date(new Date().getTime() + ACCESS_TOKEN_EXPIRE_TIME))
                 .signWith(SECRET_KEY)
                 .compact();
-
         log.info("[generateAccessToken] {}", token);
         return AccessTokenVO.of(token);
     }
 
-    public RefreshTokenVO generateRefreshToken(Member member) {
-        if (member.getEmail() == null || member.getEmail().isBlank()) {
+    public RefreshTokenVO generateRefreshToken(AuthenticatedMember authenticatedMember) {
+        if (authenticatedMember.getEmail() == null || authenticatedMember.getEmail().isBlank()) {
             return RefreshTokenVO.of("");
         }
-        return this.generateRefreshToken(member.getEmail());
+        return this.generateRefreshToken(authenticatedMember.getEmail());
     }
 
     private RefreshTokenVO generateRefreshToken(String email) {
@@ -86,7 +84,6 @@ public class JwtProvider implements TokenProvider {
                 .expiration(new Date(new Date().getTime() + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(SECRET_KEY)
                 .compact();
-
         log.info("[generateRefreshToken] {}", token);
         return RefreshTokenVO.of(token);
     }
@@ -103,7 +100,6 @@ public class JwtProvider implements TokenProvider {
                     .before(new Date())) {
                 throw new BaseException(EXPIRED_ACCESS_TOKEN);
             }
-
             String aud = claims.getPayload()
                     .getAudience()
                     .iterator()

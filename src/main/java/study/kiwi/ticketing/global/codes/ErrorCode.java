@@ -21,6 +21,8 @@ public enum ErrorCode implements BaseCode {
     BINDING_ERROR(HttpStatus.BAD_REQUEST, "BINDING-0000", "바인딩에 실패했습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER-0000", "회원이 없습니다."),
 
+    REDIS_VALUE_NOT_FOUND(HttpStatus.NOT_FOUND, "REDIS-0000", "레디스에서 값을 찾을 수 없습니다."),
+
 
     // 5xx : server error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SERVER-0000", "서버 에러");
